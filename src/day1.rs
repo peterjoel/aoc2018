@@ -1,7 +1,4 @@
-use std::{
-    io::Read,
-    fs::File,
-};
+use std::{fs::File, io::Read};
 
 use super::Result;
 
@@ -10,21 +7,54 @@ pub fn run(input_path: Option<&str>) -> Result {
     let mut file = File::open(input_path)?;
     let mut source = String::new();
     file.read_to_string(&mut source)?;
-    let sum = sum_changes(source.lines())?;
-    println!("{}", sum);
+    // Part 1
+    println!("Part 1: {}", sum_changes(&source)?);
+    // Part 2
+    println!("Part 2: {}", find_repeating_freq(&source)?);
     Ok(())
 }
 
-fn sum_changes<'a>(changes: impl Iterator<Item = &'a str>) -> Result<i32> {
-    let sum = changes
+fn sum_changes(source: &str) -> Result<i32> {
+    let sum = source
+        .lines()
         .flat_map(|line| line.parse::<i32>().ok())
         .sum();
     Ok(sum)
 }
 
+fn find_repeating_freq(source: &str) -> Result<i32> {
+    source
+        .lines()
+        .flat_map(|line| line.parse::<i32>().ok())
+        .cycle()
+        .scan((hashset![0], 0), |(seen, sum), n| {
+            *sum += n;
+            if seen.contains(sum) {
+                Some(Some(*sum))
+            } else {
+                seen.insert(*sum);
+                Some(None)
+            }
+        })
+        .flatten()
+        .next()
+        .ok_or_else(|| "Unexpected error!".into())
+}
+
 #[test]
 fn test_sum() {
-    let changes = "+1 -1 +3 -2";
-    let sum = sum_changes(changes.split_whitespace());
-    assert_eq!(Ok(1), sum);
+    let sum = sum_changes("+1\n-1\n+3\n-2");
+    assert_eq!(1, sum.unwrap());
+}
+
+#[test]
+fn repeat_immediately_zero() {
+    let sum = find_repeating_freq("+1\n-1");
+    assert_eq!(0, sum.unwrap());
+}
+
+#[test]
+fn repeat_after_loops() {
+    let sum = find_repeating_freq("+1\n+4\n+6\n-9");
+    assert_eq!(5, sum.unwrap());
 }
