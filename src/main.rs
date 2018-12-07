@@ -4,6 +4,7 @@ use clap::{App, Arg};
 mod macros;
 mod day1;
 mod day2;
+mod day3;
 
 pub type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -43,6 +44,10 @@ fn main() -> Result {
         2 => {
             println!("Day 2");
             day2::run(matches.value_of("input"))?;
+        }
+        3 => {
+            println!("Day 3");
+            day3::run(matches.value_of("input"))?;
         }
         _ => println!("I have not completed day {} yet!", day),
     }
