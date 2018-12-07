@@ -3,12 +3,12 @@ use clap::{App, Arg};
 #[macro_use]
 mod macros;
 mod day1;
+mod day2;
 
 pub type Result<T = ()> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 fn main() -> Result {
     let matches = App::new("Advent of Code 2018")
-        .version("1.0")
         .author("Peter Hall")
         .arg(
             Arg::with_name("day")
@@ -37,8 +37,12 @@ fn main() -> Result {
 
     match day {
         1 => {
-            println!("Day 1:");
+            println!("Day 1");
             day1::run(matches.value_of("input"))?;
+        }
+        2 => {
+            println!("Day 2");
+            day2::run(matches.value_of("input"))?;
         }
         _ => println!("I have not completed day {} yet!", day),
     }
